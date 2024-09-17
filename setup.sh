@@ -97,6 +97,7 @@ sudo apt-get update -y
 sudo apt-get install -y libssl-dev libasound2
 pip install azure-cognitiveservices-speech
 pip install azure-cognitiveservices-vision-computervision
+pip install azure-ai-vision-imageanalysis
 pip install scipy
 pip install python-dotenv
 sudo apt install -y ffmpeg

@@ -1,18 +1,21 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
-
+from image_analysis import analyze_image  # Import the function from image-analysis.py
 # Azure Cognitive Services Speech configuration
 
-audio_file = "nyswonger2.wav"
-speech_key = os.getenv('AZURE_SPEECH_KEY')
-service_region = os.getenv('AZURE_SERVICE_REGION')
-openai_key = os.getenv('AZURE_OPEN_API_KEY')
-openai_endpoint = os.getenv('AZURE_OPEN_API_ENDPOINT')
-openai_model = os.getenv('AZURE_OPEN_API_MODEL')
-openai_version = os.getenv('AZURE_OPEN_API_VERSION')
-openai_deployment = os.getenv('AZURE_OPEN_API_DEPLOYMENT')
+audio_file = "J.wav"
+image_path = "kitchen-night.jpg"
+image_analysis_result = analyze_image(image_path)
 
-import os
+
+speech_key = os.getenv('SS_ACCOUNT_KEY')
+service_region = os.getenv('RES_REGION')
+openai_key = os.getenv('OPENAI_ACCOUNT_KEY')
+openai_endpoint = os.getenv('ACCOUNT_ENDPOINT')
+openai_model = os.getenv('OPENAI_MODEL')
+openai_version = os.getenv('OPENAI_VERSION')
+openai_deployment = os.getenv('OPENAI_DEPLOYMENT_NAME')
+
 from openai import AzureOpenAI
     
 client = AzureOpenAI(
@@ -36,7 +39,12 @@ def check_incoherence_with_openai(text):
 
 def hydrate_text(text):
     print(f"Hydrating: {text}")
-    response = client.chat.completions.create(model=openai_deployment, messages=[{'role': 'system', 'content': f"Complete and hydrate the following text: {text}" }])
+     # Create the prompt with the image analysis result
+    prompt = f"This following context is the computer vision result from the environment:\n{image_analysis_result}\n\nComplete and hydrate the following text: {text}"    # Get the response from the OpenAI model
+    response = client.chat.completions.create(
+        model=openai_deployment,
+        messages=[{'role': 'system', 'content': prompt}]
+    )
     return response.choices[0].message.content
 
 def process_recognized_text(text):
@@ -57,7 +65,7 @@ def speech_to_text():
                 print(f"Error details: {cancellation_details.error_details}")
 
     speech_recognizer.recognized.connect(recognized_cb)
-    speech_recognizer.recognize_once()
+    speech_recognizer.start_continuous_recognition()
     
     print("Ctrl + C to stop the recognition...")
     try:
