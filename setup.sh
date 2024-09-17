@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 # Set variables
 RES_REGION=${RES_REGION:-}
 RES_GROUP=${RES_GROUP:-}
