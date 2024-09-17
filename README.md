@@ -1,57 +1,41 @@
-# Project Name
+# Quickstart
 
-(short, 1-3 sentenced, description of the project)
+## Prerequisites
 
-## Features
+1. Ensure you have Azure CommandLine and Python3 installed.
+2. Log in to Azure using the command:
+   ```shell
+   az login
+   ```
+3. If you haven't done so already, go to the Azure portal to create a Computer Vision resource. This is necessary to accept the Responsible AI terms for using Computer Vision services and for creating computer vision resources using AzCli in the future. You will only need to do this ONCE per subscription.
 
-This project framework provides the following features:
+## Steps
 
-* Feature 1
-* Feature 2
-* ...
+1. Set your desired region and resource group name, OpenAI model deployment name, as well as account names for:
+   - Computer Vision
+   - Speech Services
+   - OpenAI
 
-## Getting Started
+You can leave OPENAI_MODEL_NAME, OPENAI_MODEL_VERSION, and OPENAI_VERSION as is.
 
-### Prerequisites
+```bash
+source variables.sh
+```
+2. Run `setup.sh` and copy the 4 export commands from the terminal.
 
-(ideally very short, if any)
+```bash
+./setup.sh
+```
+3. Upload an image and audio file (`.wav`), and update main.py to reference those. 
+>Note: if you have an `.mp3` file, you can use the following command to convert it to `.wav`:
 
-- OS
-- Library version
-- ...
+```bash
+# Example
+ffmpeg -i J.mp3 J.wav
+```
 
-### Installation
+4. Run `main.py` to test the speech to text and text hydration with image analysis context
+```bash
+python3 main.py
+```
 
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
