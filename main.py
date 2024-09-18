@@ -12,7 +12,6 @@ speech_key = os.getenv('SS_ACCOUNT_KEY')
 service_region = os.getenv('RES_REGION')
 openai_key = os.getenv('OPENAI_ACCOUNT_KEY')
 openai_endpoint = os.getenv('ACCOUNT_ENDPOINT')
-openai_model = os.getenv('OPENAI_MODEL')
 openai_version = os.getenv('OPENAI_VERSION')
 openai_deployment = os.getenv('OPENAI_DEPLOYMENT_NAME')
 

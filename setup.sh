@@ -3,56 +3,21 @@
 set -e
 set -o pipefail
 
-# Set variables
-RES_REGION=${RES_REGION:-}
-RES_GROUP=${RES_GROUP:-}
-CV_ACCOUNT_NAME=${CV_ACCOUNT_NAME:-}
-SS_ACCOUNT_NAME=${SS_ACCOUNT_NAME:-}
-OPENAI_ACCOUNT_NAME=${OPENAI_ACCOUNT_NAME:-}
-OPENAI_DEPLOYMENT_NAME=${OPENAI_DEPLOYMENT_NAME:-}
-OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-}
-OPENAI_MODEL_VERSION=${OPENAI_MODEL_VERSION:-}
+# Enable debugging
+set -x
 
-# Check if variables are set
-if [ -z "$RES_REGION" ]; then
-  echo "Error: RES_REGION is not set."
-  exit 1
-fi
+# Generate a suffix based on the current date and time (mmddyyyyhhmm)
+SUFFIX=$(date +"%m%d%Y%H%M")
+echo "Generated SUFFIX: $SUFFIX"
 
-if [ -z "$RES_GROUP" ]; then
-  echo "Error: RES_GROUP is not set."
-  exit 1
-fi
-
-if [ -z "$CV_ACCOUNT_NAME" ]; then
-  echo "Error: CV_ACCOUNT_NAME is not set."
-  exit 1
-fi
-
-if [ -z "$SS_ACCOUNT_NAME" ]; then
-  echo "Error: SS_ACCOUNT_NAME is not set."
-  exit 1
-fi
-
-if [ -z "$OPENAI_ACCOUNT_NAME" ]; then
-  echo "Error: OPENAI_ACCOUNT_NAME is not set."
-  exit 1
-fi
-
-if [ -z "$OPENAI_DEPLOYMENT_NAME" ]; then
-  echo "Error: OPENAI_DEPLOYMENT_NAME is not set."
-  exit 1
-fi
-
-if [ -z "$OPENAI_MODEL_NAME" ]; then
-  echo "Error: OPENAI_MODEL_NAME is not set."
-  exit 1
-fi
-
-if [ -z "$OPENAI_MODEL_VERSION" ]; then
-  echo "Error: OPENAI_VERSION is not set."
-  exit 1
-fi
+RES_REGION=${RES_REGION:-"westus"}
+RES_GROUP=${RES_GROUP:-"rg-hack-$SUFFIX"}
+CV_ACCOUNT_NAME=${CV_ACCOUNT_NAME:-"cv-account-$SUFFIX"}
+SS_ACCOUNT_NAME=${SS_ACCOUNT_NAME:-"ss-account-$SUFFIX"}
+OPENAI_ACCOUNT_NAME=${OPENAI_ACCOUNT_NAME:-"oai-account-$SUFFIX"}
+OPENAI_DEPLOYMENT_NAME=${OPENAI_DEPLOYMENT_NAME:-"oai-deployment-$SUFFIX"}
+OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-"gpt-4"}
+OPENAI_MODEL_VERSION=${OPENAI_MODEL_VERSION:-"turbo-2024-04-09"}
 
 # Create the resource group
 az group create \
@@ -95,45 +60,46 @@ az cognitiveservices account deployment create \
     --model-version $OPENAI_MODEL_VERSION \
     --model-format OpenAI
 
-# Install necessary packages
-sudo apt-get update -y
-sudo apt-get install -y libssl-dev libasound2
-pip install azure-cognitiveservices-speech
-pip install azure-cognitiveservices-vision-computervision
-pip install azure-ai-vision-imageanalysis
-pip install scipy
-pip install python-dotenv
-sudo apt install -y ffmpeg
-pip install openai
-
 # Get cognitive account endpoint
-export ACCOUNT_ENDPOINT=$(az cognitiveservices account show \
+ACCOUNT_ENDPOINT=$(az cognitiveservices account show \
   --name $CV_ACCOUNT_NAME \
   --resource-group $RES_GROUP \
   --query "properties.endpoint")
 
 # Get key for computer vision resource
-export CV_ACCOUNT_KEY=$(az cognitiveservices account keys list \
+CV_ACCOUNT_KEY=$(az cognitiveservices account keys list \
     --resource-group $RES_GROUP \
     --name $CV_ACCOUNT_NAME \
     --query key1 \
     --output tsv)
 
 # Get the key for speech services resource
-export SS_ACCOUNT_KEY=$(az cognitiveservices account keys list \
+SS_ACCOUNT_KEY=$(az cognitiveservices account keys list \
   --name $SS_ACCOUNT_NAME \
   --resource-group $RES_GROUP \
   --query key1 \
   --output tsv)
 
 # Get the keys and endpoint for OpenAI resource
-export OPENAI_ACCOUNT_KEY=$(az cognitiveservices account keys list \
+OPENAI_ACCOUNT_KEY=$(az cognitiveservices account keys list \
     --resource-group $RES_GROUP \
     --name $OPENAI_ACCOUNT_NAME \
     --query key1 \
     --output tsv)
 
-echo "export ACCOUNT_ENDPOINT=$ACCOUNT_ENDPOINT"
-echo "export CV_ACCOUNT_KEY=$CV_ACCOUNT_KEY"
-echo "export SS_ACCOUNT_KEY=$SS_ACCOUNT_KEY"
-echo "export OPENAI_ACCOUNT_KEY=$OPENAI_ACCOUNT_KEY"
+
+
+echo "export SS_ACCOUNT_KEY=$SS_ACCOUNT_KEY" >> variables-$SUFFIX.local
+echo "export RES_REGION=$RES_REGION" >> variables-$SUFFIX.local
+echo "export OPENAI_ACCOUNT_KEY=$OPENAI_ACCOUNT_KEY" >> variables-$SUFFIX.local
+echo "export ACCOUNT_ENDPOINT=$ACCOUNT_ENDPOINT" >> variables-$SUFFIX.local
+echo "export OPENAI_VERSION=2023-03-15-preview" >> variables-$SUFFIX.local
+
+echo "export CV_ACCOUNT_KEY=$CV_ACCOUNT_KEY" >> variables-$SUFFIX.local
+echo "export OPENAI_DEPLOYMENT_NAME=$OPENAI_DEPLOYMENT_NAME" >> variables-$SUFFIX.local
+
+echo "Variables for this session have been saved to variables-$SUFFIX.local"
+echo "source variables-$SUFFIX.local"
+
+echo "To remove the resources, run:"
+echo "az group delete --name $RES_GROUP --yes"
