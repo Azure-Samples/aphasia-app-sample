@@ -41,17 +41,17 @@ def analyze_image(image_path):
     )
 
     # Save analysis results to a variable
-    result_text = f"Image analysis results for {os.path.basename(image_path)} with confidence >= {confidence_threshold:.2f}:\n"
-
+    # result_text = f"Image analysis results for {os.path.basename(image_path)} with confidence >= {confidence_threshold:.2f}:\n"
+    result_text = ""
     if result.caption is not None and result.caption.confidence >= confidence_threshold:
         result_text += " Caption:\n"
         result_text += f"   '{result.caption.text}', Confidence {result.caption.confidence:.4f}\n"
 
-    if result.dense_captions is not None:
-        result_text += " Dense Captions:\n"
-        for caption in result.dense_captions.list:
-            if caption.confidence >= confidence_threshold:
-                result_text += f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}\n"
+    # if result.dense_captions is not None:
+    #     result_text += " Dense Captions:\n"
+    #     for caption in result.dense_captions.list:
+    #         if caption.confidence >= confidence_threshold:
+    #             result_text += f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}\n"
 
     # if result.read is not None:
     #     result_text += " Read:\n"
