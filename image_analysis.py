@@ -53,35 +53,35 @@ def analyze_image(image_path):
             if caption.confidence >= confidence_threshold:
                 result_text += f"   '{caption.text}', {caption.bounding_box}, Confidence: {caption.confidence:.4f}\n"
 
-    if result.read is not None:
-        result_text += " Read:\n"
-        if result.read.blocks:
-            for block in result.read.blocks:
-                for line in block.lines:
-                    result_text += f"   Line: '{line.text}', Bounding box {line.bounding_polygon}\n"
-                    for word in line.words:
-                        if word.confidence >= confidence_threshold:
-                            result_text += f"     Word: '{word.text}', Bounding polygon {word.bounding_polygon}, Confidence {word.confidence:.4f}\n"
-        else:
-            result_text += "   No text detected.\n"
+    # if result.read is not None:
+    #     result_text += " Read:\n"
+    #     if result.read.blocks:
+    #         for block in result.read.blocks:
+    #             for line in block.lines:
+    #                 result_text += f"   Line: '{line.text}', Bounding box {line.bounding_polygon}\n"
+    #                 for word in line.words:
+    #                     if word.confidence >= confidence_threshold:
+    #                         result_text += f"     Word: '{word.text}', Bounding polygon {word.bounding_polygon}, Confidence {word.confidence:.4f}\n"
+    #     else:
+    #         result_text += "   No text detected.\n"
 
-    if result.tags is not None:
-        result_text += " Tags:\n"
-        for tag in result.tags.list:
-            if tag.confidence >= confidence_threshold:
-                result_text += f"   '{tag.name}', Confidence {tag.confidence:.4f}\n"
+    # if result.tags is not None:
+    #     result_text += " Tags:\n"
+    #     for tag in result.tags.list:
+    #         if tag.confidence >= confidence_threshold:
+    #             result_text += f"   '{tag.name}', Confidence {tag.confidence:.4f}\n"
 
-    if result.objects is not None:
-        result_text += " Objects:\n"
-        for obj in result.objects.list:
-            if obj.tags[0].confidence >= confidence_threshold:
-                result_text += f"   '{obj.tags[0].name}', {obj.bounding_box}, Confidence: {obj.tags[0].confidence:.4f}\n"
+    # if result.objects is not None:
+    #     result_text += " Objects:\n"
+    #     for obj in result.objects.list:
+    #         if obj.tags[0].confidence >= confidence_threshold:
+    #             result_text += f"   '{obj.tags[0].name}', {obj.bounding_box}, Confidence: {obj.tags[0].confidence:.4f}\n"
 
-    if result.people is not None:
-        result_text += " People:\n"
-        for person in result.people.list:
-            if person.confidence >= confidence_threshold:
-                result_text += f"   {person.bounding_box}, Confidence {person.confidence:.4f}\n"
+    # if result.people is not None:
+    #     result_text += " People:\n"
+    #     for person in result.people.list:
+    #         if person.confidence >= confidence_threshold:
+    #             result_text += f"   {person.bounding_box}, Confidence {person.confidence:.4f}\n"
 
     return result_text
 

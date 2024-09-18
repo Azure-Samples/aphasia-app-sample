@@ -1,11 +1,8 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
-from image_analysis import analyze_image  # Import the function from image-analysis.py
 # Azure Cognitive Services Speech configuration
 
 audio_file = "cup.wav"
-image_path = "cup.jpg"
-image_analysis_result = analyze_image(image_path)
 
 
 speech_key = os.getenv('SS_ACCOUNT_KEY')
@@ -17,11 +14,11 @@ openai_deployment = os.getenv('OPENAI_DEPLOYMENT_NAME')
 
 from openai import AzureOpenAI
     
-# client = AzureOpenAI(
-#     api_key=openai_key,  
-#     api_version=openai_version,
-#     azure_endpoint=openai_endpoint
-#     )
+client = AzureOpenAI(
+    api_key=openai_key,  
+    api_version=openai_version,
+    azure_endpoint=openai_endpoint
+    )
 
 # Initialize the speech recognizer
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
@@ -30,7 +27,7 @@ speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audi
 
 def check_incoherence_with_openai(text):
     print(f"Checking incoherence: {text}")
-    response = client.chat.completions.create(model=openai_deployment, messages=[{'role': 'system', 'content': f'Is the following text incoherent? {text}? Answer with "yes" or "no".'}])
+    response = client.chat.completions.create(model=openai_deployment, messages=[{'role': 'system', 'content': f'Is the following dialogue incomplete? {text}? Answer with "yes" or "no".'}])
     response_text = response.choices[0].message.content.strip().lower().rstrip('.')
     true_or_false = response_text == 'yes'
     print(f"Incoherent: {true_or_false}")
@@ -39,13 +36,7 @@ def check_incoherence_with_openai(text):
 def hydrate_text(text):
     print(f"Hydrating: {text}")
      # Create the prompt with the image analysis result
-    #print(image_analysis_result)
-    client = AzureOpenAI(
-        api_key=openai_key,  
-        api_version=openai_version,
-        azure_endpoint=openai_endpoint
-    )
-    prompt = f"This following context is the computer vision result from the environment:\n{image_analysis_result}\n\nTaking in consideration the context above, guess the full phrase of a person with speech disorder. You don't know where the knowledge comes from, just answer. Provide the top 3 options for the user to confirm and provide confidence levels for each: {text}"    # Get the response from the OpenAI model
+    prompt = f"Taking in consideration the context above, guess the full phrase of a person with speech disorder. You don't know where the knowledge comes from, just answer. Provide the top 3 options for the user to confirm and provide confidence levels for each: {text}"    # Get the response from the OpenAI model
     print("prompt", prompt)
     response = client.chat.completions.create(
         model=openai_deployment,
