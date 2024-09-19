@@ -1,9 +1,14 @@
 import os
+import argparse
 import azure.cognitiveservices.speech as speechsdk
 # Azure Cognitive Services Speech configuration
 
-audio_file = "cup.wav"
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Speech-to-Text")
+parser.add_argument('--audio', required=True, help="Path to the audio file (.wav)")
+args = parser.parse_args()
 
+audio_file = args.audio
 
 speech_key = os.getenv('SS_ACCOUNT_KEY')
 service_region = os.getenv('RES_REGION')
@@ -25,31 +30,20 @@ speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_r
 audio_config = speechsdk.audio.AudioConfig(filename=audio_file)
 speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
-def check_incoherence_with_openai(text):
-    print(f"Checking incoherence: {text}")
-    response = client.chat.completions.create(model=openai_deployment, messages=[{'role': 'system', 'content': f'Is the following dialogue incomplete? {text}? Answer with "yes" or "no".'}])
-    response_text = response.choices[0].message.content.strip().lower().rstrip('.')
-    true_or_false = response_text == 'yes'
-    print(f"Incoherent: {true_or_false}")
-    return true_or_false
-
 def hydrate_text(text):
-    print(f"Hydrating: {text}")
+    print(f"Hydrating the following text: {text}")
      # Create the prompt with the image analysis result
-    prompt = f"Taking in consideration the context above, guess the full phrase of a person with speech disorder. You don't know where the knowledge comes from, just answer. Provide the top 3 options for the user to confirm and provide confidence levels for each: {text}"    # Get the response from the OpenAI model
-    print("prompt", prompt)
+    prompt = f"Taking in consideration the context above, guess the full phrase of a person with speech disorder if the phrase is incoherent. You don't know where the knowledge comes from, just answer. Provide the top 3 options for the user to confirm and provide confidence levels for each: {text}"    # Get the response from the OpenAI model
     response = client.chat.completions.create(
         model=openai_deployment,
         messages=[{'role': 'system', 'content': prompt}]
     )
-    print("response: ", response)
     return response.choices[0].message.content
 
 def process_recognized_text(text):
-    # if check_incoherence_with_openai(text):
-    #     print(f"Incoherent detected: {text}")
     text = hydrate_text(text)
     print(f"Hydrated text: {text}")
+
 def speech_to_text():
     def recognized_cb(evt):
         if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:

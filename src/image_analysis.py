@@ -28,12 +28,12 @@ def analyze_image(image_path):
     result = client.analyze(
         image_data=image_data,
         visual_features=[
-            VisualFeatures.TAGS,
-            VisualFeatures.OBJECTS,
+            # VisualFeatures.TAGS,
+            # VisualFeatures.OBJECTS,
             VisualFeatures.CAPTION,
-            VisualFeatures.DENSE_CAPTIONS,
-            VisualFeatures.READ,
-            VisualFeatures.PEOPLE,
+            # VisualFeatures.DENSE_CAPTIONS,
+            # VisualFeatures.READ,
+            # VisualFeatures.PEOPLE,
         ],
         gender_neutral_caption=True,  # Optional (default is False)
         language="en",  # Optional. Relevant only if TAGS is specified above. See https://aka.ms/cv-languages for supported languages.
@@ -41,12 +41,12 @@ def analyze_image(image_path):
     )
 
     # Save analysis results to a variable
-    # result_text = f"Image analysis results for {os.path.basename(image_path)} with confidence >= {confidence_threshold:.2f}:\n"
     result_text = ""
     if result.caption is not None and result.caption.confidence >= confidence_threshold:
         result_text += " Caption:\n"
         result_text += f"   '{result.caption.text}', Confidence {result.caption.confidence:.4f}\n"
 
+    # Uncomment out the following if more visual features such as Optical Character Recognition (OCR) are desired
     # if result.dense_captions is not None:
     #     result_text += " Dense Captions:\n"
     #     for caption in result.dense_captions.list:
@@ -84,8 +84,3 @@ def analyze_image(image_path):
     #             result_text += f"   {person.bounding_box}, Confidence {person.confidence:.4f}\n"
 
     return result_text
-
-# Example usage
-# image_path = "kitchen-night.jpg"
-# analysis_result = analyze_image(image_path)
-# print(analysis_result)
